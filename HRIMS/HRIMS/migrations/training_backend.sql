@@ -203,3 +203,115 @@ ALTER TABLE public.leave_balances OWNER TO postgres;
 -- ========================================
 -- Table: leave_balances
 -- ========================================
+
+
+
+-- ========================================
+-- Foreign Key: sports_events.organized_by → users.id
+-- ========================================
+ALTER TABLE IF EXISTS public.sports_events
+    ADD CONSTRAINT sports_events_organized_by_fkey
+    FOREIGN KEY (organized_by)
+    REFERENCES public.users (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE SET NULL;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: sports_participants.employee_id → employees.id
+-- ========================================
+ALTER TABLE IF EXISTS public.sports_participants
+    ADD CONSTRAINT sports_participants_employee_id_fkey
+    FOREIGN KEY (employee_id)
+    REFERENCES public.employees (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE CASCADE;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: sports_participants.event_id → sports_events.id
+-- ========================================
+ALTER TABLE IF EXISTS public.sports_participants
+    ADD CONSTRAINT sports_participants_event_id_fkey
+    FOREIGN KEY (event_id)
+    REFERENCES public.sports_events (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE CASCADE;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: student_training_enrollment.student_id → student.id
+-- ========================================
+ALTER TABLE IF EXISTS public.student_training_enrollment
+    ADD CONSTRAINT student_training_enrollment_student_id_fkey
+    FOREIGN KEY (student_id)
+    REFERENCES public.student (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: student_training_enrollment.training_program_id → training_program.id
+-- ========================================
+ALTER TABLE IF EXISTS public.student_training_enrollment
+    ADD CONSTRAINT student_training_enrollment_training_program_id_fkey
+    FOREIGN KEY (training_program_id)
+    REFERENCES public.training_program (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: team.created_by → employees.id
+-- ========================================
+ALTER TABLE IF EXISTS public.team
+    ADD CONSTRAINT team_created_by_fkey
+    FOREIGN KEY (created_by)
+    REFERENCES public.employees (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE SET NULL;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: training_program.department_id → departments.id
+-- ========================================
+ALTER TABLE IF EXISTS public.training_program
+    ADD CONSTRAINT training_program_department_id_fkey
+    FOREIGN KEY (department_id)
+    REFERENCES public.departments (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: transport_requests.driver_id → drivers.driver_id
+-- ========================================
+ALTER TABLE IF EXISTS public.transport_requests
+    ADD CONSTRAINT transport_requests_driver_id_fkey
+    FOREIGN KEY (driver_id)
+    REFERENCES public.drivers (driver_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: transport_requests.vehicle_id → vehicles.vehicle_id
+-- ========================================
+ALTER TABLE IF EXISTS public.transport_requests
+    ADD CONSTRAINT transport_requests_vehicle_id_fkey
+    FOREIGN KEY (vehicle_id)
+    REFERENCES public.vehicles (vehicle_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+-- ========================================
+
+-- ========================================
+-- Foreign Key: users.role_id → roles.id
+-- ========================================
+ALTER TABLE IF EXISTS public.users
+    ADD CONSTRAINT users_role_id_fkey
+    FOREIGN KEY (role_id)
+    REFERENCES public.roles (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE SET NULL;
+-- ========================================
