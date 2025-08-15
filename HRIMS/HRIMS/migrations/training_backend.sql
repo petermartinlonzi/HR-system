@@ -82,7 +82,6 @@ CREATE TABLE IF NOT EXISTS public.salary_scale (
     id SERIAL NOT NULL,
     salary_scale_name VARCHAR(255) NOT NULL,
     position_id INTEGER NOT NULL,
-    minimum_salary NUMERIC(15,2) NOT NULL,
     maximum_salary NUMERIC(15,2) NOT NULL,
     currency_type VARCHAR(10) NOT NULL,
 
