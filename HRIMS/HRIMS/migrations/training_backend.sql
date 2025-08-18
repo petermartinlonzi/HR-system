@@ -112,21 +112,56 @@ CREATE TABLE IF NOT EXISTS public.budget (
 );
 ALTER TABLE public.budget OWNER TO postgres;
 -- ========================================
--- Table: Campus
+-- Table: campuses
 -- ========================================
-CREATE TABLE IF NOT EXISTS public.campus (
-    campus_id SERIAL PRIMARY KEY,
-    campus_name VARCHAR(255) NOT NULL,
-    description TEXT,
-    department_id INTEGER,
+CREATE TABLE IF NOT EXISTS public.campuses (
+    id SERIAL NOT NULL,
+    name VARCHAR(60) NOT NULL,
+    description VARCHAR(60),
     resvd5 CHAR(1),
     resvd4 CHAR(1),
     resvd3 CHAR(1),
     resvd2 CHAR(1),
     resvd1 CHAR(1),
     created_by INTEGER,
+    updated_by INTEGER,
+    deleted_by INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE,
-    deleted_at TIMESTAMP WITH TIME ZONE
+    deleted_at TIMESTAMP WITH TIME ZONE,
+    PRIMARY KEY(id)
 );
-ALTER TABLE public.campus OWNER TO postgres;
+ALTER TABLE public.campuses OWNER TO postgres;
+
+
+-- ========================================
+-- Table: contract
+-- ========================================
+CREATE TABLE IF NOT EXISTS public.contract (
+    id SERIAL NOT NULL,
+    application_id INTEGER REFERENCES public.application(id) ON DELETE CASCADE,
+    employee_id INTEGER REFERENCES public.users(id),
+    job_id INTEGER REFERENCES public.job_advert(id),
+    contract_type VARCHAR(50),
+    start_date DATE NOT NULL,
+    end_date DATE,
+    signed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    contract_status_id INTEGER DEFAULT 1 REFERENCES public.contract_status(id) ON DELETE RESTRICT,
+
+    resvd5 CHAR(1),
+    resvd4 CHAR(1),
+    resvd3 CHAR(1),
+    resvd2 CHAR(1),
+    resvd1 CHAR(1),
+
+    created_by INTEGER,
+    updated_by INTEGER,
+    deleted_by INTEGER,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE,
+    deleted_at TIMESTAMP WITH TIME ZONE,
+
+    PRIMARY KEY(id)
+);
+ALTER TABLE public.contract OWNER TO postgres;
