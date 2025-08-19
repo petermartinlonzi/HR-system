@@ -207,111 +207,173 @@ ALTER TABLE public.leave_balances OWNER TO postgres;
 
 
 -- ========================================
--- Foreign Key: sports_events.organized_by → users.id
+-- Table: student_training_enrollment
 -- ========================================
-ALTER TABLE IF EXISTS public.sports_events
-    ADD CONSTRAINT sports_events_organized_by_fkey
-    FOREIGN KEY (organized_by)
-    REFERENCES public.users (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE SET NULL;
+CREATE TABLE IF NOT EXISTS public.student_training_enrollment
+(
+    id SERIAL NOT NULL,
+    student_id INTEGER,
+    training_program_id INTEGER,
+    enrolled_at TIMESTAMP(0) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    status CHARACTER VARYING(20) DEFAULT 'Enrolled',
+
+    resvd5 CHARACTER VARYING(1),
+    resvd4 CHARACTER VARYING(1),
+    resvd3 CHARACTER VARYING(1),
+    resvd2 CHARACTER VARYING(1),
+    resvd1 CHARACTER VARYING(1),
+
+    created_by INTEGER,
+    updated_by INTEGER,
+    deleted_by INTEGER,
+    updated_at TIMESTAMP(0) WITH TIME ZONE,
+    deleted_at TIMESTAMP(0) WITH TIME ZONE,
+
+    CONSTRAINT student_training_enrollment_pkey PRIMARY KEY (id)
+);
+ALTER TABLE public.student_training_enrollment OWNER TO postgres;
+-- ========================================
+-- Table: student_training_enrollment
+-- ========================================
+
+
+-- ========================================
+-- Table: team
+-- ========================================
+CREATE TABLE IF NOT EXISTS public.team
+(
+    id SERIAL NOT NULL,
+    team_name CHARACTER VARYING(100) NOT NULL,
+    description TEXT,
+    created_by INTEGER,
+
+    resvd5 CHARACTER VARYING(1),
+    resvd4 CHARACTER VARYING(1),
+    resvd3 CHARACTER VARYING(1),
+    resvd2 CHARACTER VARYING(1),
+    resvd1 CHARACTER VARYING(1),
+
+    created_by_user INTEGER,
+    updated_by INTEGER,
+    deleted_by INTEGER,
+    created_at TIMESTAMP(0) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(0) WITH TIME ZONE,
+    deleted_at TIMESTAMP(0) WITH TIME ZONE,
+
+    CONSTRAINT team_pkey PRIMARY KEY (id),
+    CONSTRAINT team_team_name_key UNIQUE (team_name)
+);
+ALTER TABLE public.team OWNER TO postgres;
+-- ========================================
+-- Table: team
+-- ========================================
+
+
+-- ========================================
+-- Table: training_program
+-- ========================================
+CREATE TABLE IF NOT EXISTS public.training_program
+(
+    id SERIAL NOT NULL,
+    title CHARACTER VARYING(100),
+    description TEXT,
+    start_date DATE,
+    end_date DATE,
+    department_id INTEGER,
+
+    resvd5 CHARACTER VARYING(1),
+    resvd4 CHARACTER VARYING(1),
+    resvd3 CHARACTER VARYING(1),
+    resvd2 CHARACTER VARYING(1),
+    resvd1 CHARACTER VARYING(1),
+
+    created_by INTEGER,
+    updated_by INTEGER,
+    deleted_by INTEGER,
+    created_at TIMESTAMP(0) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(0) WITH TIME ZONE,
+    deleted_at TIMESTAMP(0) WITH TIME ZONE,
+
+    CONSTRAINT training_program_pkey PRIMARY KEY (id)
+);
+ALTER TABLE public.training_program OWNER TO postgres;
+-- ========================================
+-- Table: training_program
+-- ========================================
+
+
+-- ========================================
+-- Table: transport_requests
+-- ========================================
+CREATE TABLE IF NOT EXISTS public.transport_requests
+(
+    request_id SERIAL NOT NULL,
+    requester_id INTEGER NOT NULL,
+    driver_id INTEGER,
+    vehicle_id INTEGER,
+    origin CHARACTER VARYING(100) NOT NULL,
+    destination CHARACTER VARYING(100) NOT NULL,
+    purpose TEXT,
+    requested_date DATE NOT NULL,
+    departure_time TIMESTAMP(0) WITH TIME ZONE,
+    return_time TIMESTAMP(0) WITH TIME ZONE,
+    approval_status CHARACTER VARYING(20) DEFAULT 'Pending',
+
+    resvd5 CHARACTER VARYING(1),
+    resvd4 CHARACTER VARYING(1),
+    resvd3 CHARACTER VARYING(1),
+    resvd2 CHARACTER VARYING(1),
+    resvd1 CHARACTER VARYING(1),
+
+    created_by INTEGER,
+    updated_by INTEGER,
+    deleted_by INTEGER,
+    created_at TIMESTAMP(0) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(0) WITH TIME ZONE,
+    deleted_at TIMESTAMP(0) WITH TIME ZONE,
+
+    CONSTRAINT transport_requests_pkey PRIMARY KEY (request_id)
+);
+ALTER TABLE public.transport_requests OWNER TO postgres;
+-- ========================================
+-- Table: transport_requests
 -- ========================================
 
 -- ========================================
--- Foreign Key: sports_participants.employee_id → employees.id
+-- Table: users
 -- ========================================
-ALTER TABLE IF EXISTS public.sports_participants
-    ADD CONSTRAINT sports_participants_employee_id_fkey
-    FOREIGN KEY (employee_id)
-    REFERENCES public.employees (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE CASCADE;
--- ========================================
+CREATE TABLE IF NOT EXISTS public.users
+(
+    id SERIAL NOT NULL,
+    first_name CHARACTER VARYING(50) NOT NULL,
+    middle_name CHARACTER VARYING(100),
+    surname CHARACTER VARYING(100),
+    age INTEGER,
+    email CHARACTER VARYING(100) NOT NULL,
+    phone_number CHARACTER VARYING(20),
+    password CHARACTER VARYING(255),
+    password_hash TEXT NOT NULL,
+    role_id INTEGER,
+    is_active BOOLEAN DEFAULT TRUE,
 
--- ========================================
--- Foreign Key: sports_participants.event_id → sports_events.id
--- ========================================
-ALTER TABLE IF EXISTS public.sports_participants
-    ADD CONSTRAINT sports_participants_event_id_fkey
-    FOREIGN KEY (event_id)
-    REFERENCES public.sports_events (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE CASCADE;
--- ========================================
+    resvd5 CHARACTER VARYING(1),
+    resvd4 CHARACTER VARYING(1),
+    resvd3 CHARACTER VARYING(1),
+    resvd2 CHARACTER VARYING(1),
+    resvd1 CHARACTER VARYING(1),
 
--- ========================================
--- Foreign Key: student_training_enrollment.student_id → student.id
--- ========================================
-ALTER TABLE IF EXISTS public.student_training_enrollment
-    ADD CONSTRAINT student_training_enrollment_student_id_fkey
-    FOREIGN KEY (student_id)
-    REFERENCES public.student (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
--- ========================================
+    created_by INTEGER,
+    updated_by INTEGER,
+    deleted_by INTEGER,
+    created_at TIMESTAMP(0) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP(0) WITH TIME ZONE,
+    deleted_at TIMESTAMP(0) WITH TIME ZONE,
 
+    CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT users_email_key UNIQUE (email),
+    CONSTRAINT users_username_key UNIQUE (first_name)
+);
+ALTER TABLE public.users OWNER TO postgres;
 -- ========================================
--- Foreign Key: student_training_enrollment.training_program_id → training_program.id
--- ========================================
-ALTER TABLE IF EXISTS public.student_training_enrollment
-    ADD CONSTRAINT student_training_enrollment_training_program_id_fkey
-    FOREIGN KEY (training_program_id)
-    REFERENCES public.training_program (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
--- ========================================
-
--- ========================================
--- Foreign Key: team.created_by → employees.id
--- ========================================
-ALTER TABLE IF EXISTS public.team
-    ADD CONSTRAINT team_created_by_fkey
-    FOREIGN KEY (created_by)
-    REFERENCES public.employees (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE SET NULL;
--- ========================================
-
--- ========================================
--- Foreign Key: training_program.department_id → departments.id
--- ========================================
-ALTER TABLE IF EXISTS public.training_program
-    ADD CONSTRAINT training_program_department_id_fkey
-    FOREIGN KEY (department_id)
-    REFERENCES public.departments (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
--- ========================================
-
--- ========================================
--- Foreign Key: transport_requests.driver_id → drivers.driver_id
--- ========================================
-ALTER TABLE IF EXISTS public.transport_requests
-    ADD CONSTRAINT transport_requests_driver_id_fkey
-    FOREIGN KEY (driver_id)
-    REFERENCES public.drivers (driver_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
--- ========================================
-
--- ========================================
--- Foreign Key: transport_requests.vehicle_id → vehicles.vehicle_id
--- ========================================
-ALTER TABLE IF EXISTS public.transport_requests
-    ADD CONSTRAINT transport_requests_vehicle_id_fkey
-    FOREIGN KEY (vehicle_id)
-    REFERENCES public.vehicles (vehicle_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
--- ========================================
-
--- ========================================
--- Foreign Key: users.role_id → roles.id
--- ========================================
-ALTER TABLE IF EXISTS public.users
-    ADD CONSTRAINT users_role_id_fkey
-    FOREIGN KEY (role_id)
-    REFERENCES public.roles (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE SET NULL;
+-- Table: users
 -- ========================================
