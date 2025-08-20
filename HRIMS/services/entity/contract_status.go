@@ -12,7 +12,11 @@ type ContractStatus struct {
 	Description string
 	CreatedBy  int32
 	UpdatedBy  int32
-	
+	DeletedBy  int32
+	CreatedAt  time.Time
+	UpdatedAt  *time.Time
+	DeletedAt  *time.Time
+}
 
 func NewContractStatus(statusName, description string, createdBy int32) (*ContractStatus, error) {
 	entity := &ContractStatus{
