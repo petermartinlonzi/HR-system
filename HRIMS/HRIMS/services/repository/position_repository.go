@@ -33,7 +33,6 @@ func (con *PositionConn) Create(e *entity.Position) (int32, error) {
 	var id int32
 	query := `INSERT INTO position (name, description, created_by, created_at) VALUES($1, $2, $3, $4) RETURNING id`
 
-
 	err := con.conn.QueryRow(context.Background(), query,
 		e.Name,
 		e.Description,
@@ -196,5 +195,4 @@ func (con *PositionConn) HardDelete(id int32) error {
 		return err
 	}
 	return err
-}
 }
