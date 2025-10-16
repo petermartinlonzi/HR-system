@@ -12,45 +12,47 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-// PositionConn Initializes connection to DB
-type PositionConn struct {
+// RoleConn Initializes connection to DB
+type RoleConn struct {
 	conn *pgxpool.Pool
 }
 
-// NewPosition Connects to DB
-func NewPosition() *PositionConn {
+// NewRole Connects to DB
+func NewRole() *RoleConn {
 	conn, err := database.Connect()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 	}
-	return &PositionConn{
+	return &RoleConn{
 		conn: conn,
 	}
 }
 
 // Create Inserts new record to DB
-func (con *PositionConn) Create(e *entity.Position) (int32, error) {
+func (con *RoleConn) Create(e *entity.Role) (int32, error) {
 	var id int32
-	query := `INSERT INTO position (name, description, created_by, created_at) VALUES($1, $2, $3, $4) RETURNING id`
-
+	query := `INSERT INTO role 
+				(name, description, created_by, created_at) 
+			  VALUES($1,$2,$3,$4) RETURNING id`
 
 	err := con.conn.QueryRow(context.Background(), query,
 		e.Name,
 		e.Description,
 		e.CreatedBy,
-		time.Now().Local()).Scan(&id)
+		time.Now().Local(),
+	).Scan(&id)
 	return id, err
 }
 
-// CheckPosition Checks if record exists in DB
-func (con *PositionConn) CheckPosition(name string) (bool, error) {
+// CheckRole Checks if record exists in DB by name
+func (con *RoleConn) CheckRole(name string) (bool, error) {
 	var exists bool
-	query := "SELECT EXISTS(SELECT 1 FROM position WHERE name = $1)"
+	query := "SELECT EXISTS(SELECT 1 FROM role WHERE name = $1)"
 	err := con.conn.QueryRow(context.Background(), query, name).Scan(&exists)
 	return exists, err
 }
 
-func positionSelectQuery() string {
+func roleSelectQuery() string {
 	return `SELECT
 				id,
 				name,
@@ -61,11 +63,11 @@ func positionSelectQuery() string {
 				created_at,
 				updated_at,
 				deleted_at
-			FROM position WHERE deleted_at IS NULL`
+			FROM role WHERE deleted_at IS NULL`
 }
 
 // List Lists all records
-func (con *PositionConn) List() ([]*entity.Position, error) {
+func (con *RoleConn) List() ([]*entity.Role, error) {
 	var id pgtype.Int4
 	var name pgtype.Text
 	var description pgtype.Text
@@ -76,12 +78,12 @@ func (con *PositionConn) List() ([]*entity.Position, error) {
 	var updatedAt pgtype.Timestamp
 	var deletedAt pgtype.Timestamp
 
-	var items []*entity.Position
+	var items []*entity.Role
 
-	query := positionSelectQuery()
+	query := roleSelectQuery()
 	rows, err := con.conn.Query(context.Background(), query)
 	if err != nil {
-		return []*entity.Position{}, err
+		return []*entity.Role{}, err
 	}
 
 	for rows.Next() {
@@ -96,9 +98,10 @@ func (con *PositionConn) List() ([]*entity.Position, error) {
 			&updatedAt,
 			&deletedAt,
 		); err != nil {
-			return []*entity.Position{}, err
+			return []*entity.Role{}, err
 		}
-		item := &entity.Position{
+
+		item := &entity.Role{
 			ID:          id.Int,
 			Name:        name.String,
 			Description: description.String,
@@ -116,7 +119,7 @@ func (con *PositionConn) List() ([]*entity.Position, error) {
 }
 
 // Get Gets single record by ID field
-func (con *PositionConn) Get(id int32) (*entity.Position, error) {
+func (con *RoleConn) Get(id int32) (*entity.Role, error) {
 	var name pgtype.Text
 	var description pgtype.Text
 	var createdBy pgtype.Int4
@@ -126,9 +129,9 @@ func (con *PositionConn) Get(id int32) (*entity.Position, error) {
 	var updatedAt pgtype.Timestamp
 	var deletedAt pgtype.Timestamp
 
-	var item *entity.Position
+	var item *entity.Role
 
-	query := positionSelectQuery() + ` AND id = $1`
+	query := roleSelectQuery() + ` AND id = $1`
 	err := con.conn.QueryRow(context.Background(), query, id).Scan(
 		&id,
 		&name,
@@ -145,7 +148,7 @@ func (con *PositionConn) Get(id int32) (*entity.Position, error) {
 		return item, err
 	}
 
-	item = &entity.Position{
+	item = &entity.Role{
 		ID:          id,
 		Name:        name.String,
 		Description: description.String,
@@ -160,18 +163,20 @@ func (con *PositionConn) Get(id int32) (*entity.Position, error) {
 }
 
 // Update Updates single record by ID field
-func (con *PositionConn) Update(e *entity.Position) (int32, error) {
-	query := `UPDATE position SET 
+func (con *RoleConn) Update(e *entity.Role) (int32, error) {
+	query := `UPDATE role SET 
 				name = $1, 
 				description = $2, 
 				updated_by = $3, 
-				updated_at = $4 WHERE id = $5`
+				updated_at = $4 
+			  WHERE id = $5`
 	_, err := con.conn.Exec(context.Background(), query,
 		e.Name,
 		e.Description,
 		e.UpdatedBy,
 		time.Now().Local(),
-		e.ID)
+		e.ID,
+	)
 	if err != nil {
 		return e.ID, err
 	}
@@ -179,8 +184,8 @@ func (con *PositionConn) Update(e *entity.Position) (int32, error) {
 }
 
 // SoftDelete Softly delete single record by ID
-func (con *PositionConn) SoftDelete(id, deletedBy int32) error {
-	query := "UPDATE position SET deleted_by = $1, deleted_at = $2 WHERE id = $3"
+func (con *RoleConn) SoftDelete(id, deletedBy int32) error {
+	query := "UPDATE role SET deleted_by = $1, deleted_at = $2 WHERE id = $3"
 	_, err := con.conn.Exec(context.Background(), query, deletedBy, time.Now().Local(), id)
 	if err != nil {
 		return err
@@ -189,12 +194,11 @@ func (con *PositionConn) SoftDelete(id, deletedBy int32) error {
 }
 
 // HardDelete Permanently delete single record by ID
-func (con *PositionConn) HardDelete(id int32) error {
-	query := "DELETE FROM position WHERE id = $1"
+func (con *RoleConn) HardDelete(id int32) error {
+	query := "DELETE FROM role WHERE id = $1"
 	_, err := con.conn.Exec(context.Background(), query, id)
 	if err != nil {
 		return err
 	}
 	return err
-}
 }
